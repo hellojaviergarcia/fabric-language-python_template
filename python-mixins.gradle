@@ -1,0 +1,44 @@
+// This script can be applied by any Python mod by adding this to their build.gradle:
+// apply from: "python-mixins.gradle"
+// It ensures that Python Mixins are compiled into Java before the Java compilation step.
+
+task generatePythonMixins(type: Exec) {
+    def pythonSrcDir = file("src/main/python")
+    def genJavaDir = file("build/generated/sources/mixins/java")
+
+    // Only run this task if the mod actually has a Python source directory
+    onlyIf {
+        pythonSrcDir.exists()
+    }
+
+    // Set Gradle inputs/outputs for build caching and UP-TO-DATE checks
+    if (pythonSrcDir.exists()) {
+        inputs.dir(pythonSrcDir)
+    }
+    outputs.dir(genJavaDir)
+
+    // Execute the Python AST compiler script.
+    // Note: This requires a working Python installation on the system PATH.
+    commandLine 'python', 'mixin_generator.py', pythonSrcDir.absolutePath, genJavaDir.absolutePath
+}
+
+// Hook the custom task into the standard Gradle lifecycle.
+// We must generate the Java mixin files BEFORE the Java compiler runs.
+tasks.named('compileJava').configure {
+    dependsOn 'generatePythonMixins'
+}
+tasks.matching { it.name == 'sourcesJar' }.configureEach {
+    dependsOn 'generatePythonMixins'
+}
+
+// Tell the Java compiler to include the dynamically generated Java files in its source set
+sourceSets {
+    main {
+        java {
+            srcDirs += 'build/generated/sources/mixins/java'
+        }
+        resources {
+            srcDirs += 'src/main/python'
+        }
+    }
+}

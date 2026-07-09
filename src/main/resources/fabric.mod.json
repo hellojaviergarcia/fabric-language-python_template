@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "mymod",
+  "version": "${version}",
+  "name": "My Python Mod",
+  "description": "An example mod created with fabric-language-python.",
+  "authors": [
+    "Your Name"
+  ],
+  "contact": {
+    "homepage": "https://github.com/yourname/mymod",
+    "sources": "https://github.com/yourname/mymod"
+  },
+  "license": "MIT",
+  "icon": "assets/mymod/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      {
+        "adapter": "python",
+        "value": "mymod::mod_instance"
+      }
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.16.9",
+    "minecraft": "~26.2",
+    "java": ">=25",
+    "fabric-language-python": ">=1.0.0"
+  }
+}
